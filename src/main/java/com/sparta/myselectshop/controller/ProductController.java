@@ -21,6 +21,7 @@ public class ProductController {
     private final ProductService productService;
 
     //http body 데이터를 받을 것임
+
     @PostMapping("/products")
     public ProductResponseDto createProduct(@RequestBody ProductRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return productService.createProduct(requestDto, userDetails.getUser());
@@ -47,4 +48,13 @@ public class ProductController {
 //   public List<ProductResponseDto> getAllProducts() {
 //        return productService.getAllProducts();
 //   }
+
+    @PostMapping("/products/{productId}/folder")
+    public void addFolder(
+            @PathVariable Long productId,
+            @RequestParam("folderId") Long folderId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+            productService.addFolder(productId, folderId, userDetails.getUser());
+    }
 }

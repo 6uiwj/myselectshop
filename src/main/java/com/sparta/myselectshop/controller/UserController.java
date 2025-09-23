@@ -68,6 +68,7 @@ public class UserController {
     }
 
     //오버 로딩
+    //고객의 폴더정보 조회
     @GetMapping("/user-folder")
     public String getUserInfo(Model model, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         model.addAttribute("folders", folderService.getFolders(userDetails.getUser()));

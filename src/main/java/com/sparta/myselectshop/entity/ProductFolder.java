@@ -27,4 +27,6 @@ public class ProductFolder { //외래캐의 주인
         this.product = product;
         this.folder = folder;
     }
+
+    //폴더가 이미 등록되어있는지 중복 확인 (중간 엔티티에서 product_id와 forder_id가 일치하면안됨..?)
 }

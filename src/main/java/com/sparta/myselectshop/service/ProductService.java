@@ -5,9 +5,14 @@ import com.sparta.myselectshop.dto.ProductRequestDto;
 import com.sparta.myselectshop.dto.ProductResponseDto;
 import com.sparta.myselectshop.entity.Product;
 import com.sparta.myselectshop.entity.User;
+import com.sparta.myselectshop.entity.UserRoleEnum;
 import com.sparta.myselectshop.naver.dto.ItemDto;
 import com.sparta.myselectshop.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,16 +50,26 @@ public class ProductService {
         return new ProductResponseDto(product);
     }
 
-    public List<ProductResponseDto> getProducts(User user) {
-        List<Product> productList = productRepository.findAllByUser(user);
-        List<ProductResponseDto> responseDtoList = new ArrayList<>(); //반환값 넣어줄곳
+    public Page<ProductResponseDto> getProducts(User user, int page, int size, String sortBy, boolean isAsc) {
+        Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort sort = Sort.by(direction, sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
 
-        //product객체를 productResponseDto 객체로 변환
-        for (Product product : productList) {
-            responseDtoList.add(new ProductResponseDto(product));
+        //권한 확인 후 모든 제품 조회기능을 줄지 안줄지
+        UserRoleEnum userRoleEnum = user.getRole();
+
+        Page<Product> productList;
+
+        //일반 유저이면 해당 유저가 관심등록한 상품만 조회
+        if (userRoleEnum == UserRoleEnum.USER) {
+            productList = productRepository.findAllByUser(user, pageable);
+        } else { //관리자면 모든 상품 조회
+            productList = productRepository.findAll(pageable);
+
         }
-
-        return  responseDtoList;
+        //page타입에 있는 product data를 하나씩 꺼내와 productResponseDto 생성자가 하나씩 호출,
+        // -> product를 productResponseDto로 변환
+        return productList.map(ProductResponseDto::new);
     }
 
     @Transactional //dirty checking 을 위해
@@ -65,15 +80,15 @@ public class ProductService {
         product.updateByItemDto(itemDto);
     }
 
-    public List<ProductResponseDto> getAllProducts() {
-        List<Product> productList = productRepository.findAll();
-        List<ProductResponseDto> responseDtoList = new ArrayList<>(); //반환값 넣어줄곳
-
-        //product객체를 productResponseDto 객체로 변환
-        for (Product product : productList) {
-            responseDtoList.add(new ProductResponseDto(product));
-        }
-
-        return  responseDtoList;
-    }
+//    public List<ProductResponseDto> getAllProducts() {
+//        List<Product> productList = productRepository.findAll();
+//        List<ProductResponseDto> responseDtoList = new ArrayList<>(); //반환값 넣어줄곳
+//
+//        //product객체를 productResponseDto 객체로 변환
+//        for (Product product : productList) {
+//            responseDtoList.add(new ProductResponseDto(product));
+//        }
+//
+//        return  responseDtoList;
+//    }
 }

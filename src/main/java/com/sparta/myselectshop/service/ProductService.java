@@ -112,6 +112,19 @@ public class ProductService {
         productFolderRepository.save(new ProductFolder(product, folder));
     }
 
+    public Page<ProductResponseDto> getProductsInFolder(Long folderId, int page, int size, String sortBy, boolean isAsc, User user) {
+        Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort sort = Sort.by(direction, sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        //해당 폴더에 등록되어 있는 상품 가져오기
+        Page<Product> productList = productRepository.findAllByUserAndProductFolderList_FolderId(user,folderId, pageable);
+
+        Page<ProductResponseDto> responseDtoList = productList.map(ProductResponseDto::new);
+
+        return responseDtoList;
+    }
+
 //    public List<ProductResponseDto> getAllProducts() {
 //        List<Product> productList = productRepository.findAll();
 //        List<ProductResponseDto> responseDtoList = new ArrayList<>(); //반환값 넣어줄곳

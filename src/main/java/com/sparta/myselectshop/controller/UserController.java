@@ -84,8 +84,8 @@ public class UserController {
         //code를 처리해줄 서비스
         String token = kakaoService.kakaoLogin(code); //jwt토큰 반환
         //Response 객체에 넣어주기
-
-        Cookie cookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, token);
+                                                                    //"Bearer " 떼고 저장
+        Cookie cookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, token.substring(7));
         cookie.setPath("/");
         response.addCookie(cookie);
 

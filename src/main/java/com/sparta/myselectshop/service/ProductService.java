@@ -16,8 +16,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -25,11 +23,10 @@ import java.util.Optional;
 public class ProductService {
 
     private final ProductRepository productRepository;
-
     private final FolderRepository folderRepository;
+    private final ProductFolderRepository productFolderRepository;
 
     public static final int MIN_MY_PRICE = 100; //myprice 최저가 100원으로 설정
-    private final ProductFolderRepository productFolderRepository;
 
     public ProductResponseDto createProduct(ProductRequestDto requestDto, User user) {
         Product product = productRepository.save(new Product(requestDto, user));
@@ -41,7 +38,7 @@ public class ProductService {
         //가격 가져오기
         int myprice = requestDto.getMyprice();
         if(myprice < MIN_MY_PRICE) { //내 설정가가 최저가보다 작으면 exception
-            throw new IllegalArgumentException("유효햐지 않는 관심 가격입니다. 최소 " + MIN_MY_PRICE+"원 이상으로 설정해주세요.");
+            throw new IllegalArgumentException("유효하지 않는 관심 가격입니다. 최소 " + MIN_MY_PRICE+"원 이상으로 설정해주세요.");
         }
 
         //해당 물건이 있는가 -> 없으면 exception
